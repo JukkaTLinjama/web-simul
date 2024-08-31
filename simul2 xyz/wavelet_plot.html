@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wavelet Plot Testing</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/wavelet.js"></script>
+    <style>
+        #controls {
+            margin-bottom: 20px;
+        }
+        #waveletChart {
+            max-width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wavelet Plot Testing</h1>
+    <div id="controls">
+        <div class="slider-container">
+            <label for="numWavelets">Number of Wavelets: </label>
+            <input type="number" id="numWavelets" min="1" max="10" step="1" value="5">
+        </div>
+        <div class="slider-container">
+            <label for="baseFrequency">Base Frequency (Hz): </label>
+            <input type="number" id="baseFrequency" step="0.01" value="1">
+        </div>
+        <div class="slider-container">
+            <label for="freqVariation">Frequency Variation: </label>
+            <input type="number" id="freqVariation" step="0.01" value="0.02">
+        </div>
+        <button id="generateWaveletsButton">Generate and Plot Wavelets</button>
+    </div>
+
+    <!-- Canvas for plotting wavelets -->
+    <canvas id="waveletChart" width="800" height="400"></canvas>
+
+    <script>
+        // Function to generate and plot wavelets
+        function generateAndPlotWavelets() {
+            const length = 500;
+            const numWavelets = parseInt(document.getElementById('numWavelets').value);
+            const baseFrequency = parseFloat(document.getElementById('baseFrequency').value);
+            const freqVariation = parseFloat(document.getElementById('freqVariation').value);
+
+            const { sequenceX: waveletX, sequenceY: waveletY } = generateWaveletSequence(
+                length,
+                numWavelets,
+                baseFrequency,
+                freqVariation
+            );
+
+            plotWavelets(waveletX, waveletY);
+        }
+
+        // Function to plot wavelets using Chart.js
+        function plotWavelets(waveletX, waveletY) {
+            const ctx = document.getElementById('waveletChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: waveletX.length}, (_, i) => i),  // X-axis labels (time steps)
+                    datasets: [
+                        {
+                            label: 'Wavelet X',
+                            data: waveletX,
+                            borderColor: 'blue',
+                            fill: false,
+                        },
+                        {
+                            label: 'Wavelet Y',
+                            data: waveletY,
+                            borderColor: 'red',
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Wavelets X and Y Over Time'
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Time Step'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amplitude'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Attach event listener to the button
+        document.getElementById('generateWaveletsButton').addEventListener('click', generateAndPlotWavelets);
+    </script>
+</body>
+</html>
